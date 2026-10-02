@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    runs-on: macos-15
+    runs-on: macos-26
     env:
       SCHEME: HomelabGlance
       DEVICE: iPhone 16
@@ -27,7 +27,7 @@ jobs:
             -scheme "$SCHEME" \
             -configuration Debug \
             -sdk iphonesimulator \
-            -destination "platform=iOS Simulator,name=$DEVICE" \
+            -destination "platform=iOS Simulator,name=$DEVICE,arch=arm64" \
             -derivedDataPath build \
             CODE_SIGNING_ALLOWED=NO \
             | xcbeautify
