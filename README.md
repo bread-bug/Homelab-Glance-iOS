@@ -1,24 +1,21 @@
 # Homelab Glance (iOS)
 
-A glanceable, read-only iOS client for self-hosted services. Not a management app —
-it surfaces the one thing worth checking from a phone, natively.
+A read-only iOS client for self-hosted services. Surfaces status at a glance.
 
-**v1 scope:** Proxmox backup run history. One screen, nothing else.
+**v1 scope:** Proxmox backup run history.
 
-## Why native / why this setup
+## Build
 
-Development happens on Linux, so there is no local Xcode. The loop is:
+No `.xcodeproj` is committed — `project.yml` is the source of truth and XcodeGen
+generates the project in CI.
 
-1. Edit SwiftUI sources here.
-2. Push.
-3. GitHub Actions (free macOS runners on a public repo) generates the Xcode project
-   with XcodeGen, builds for the simulator, boots it, and uploads **light and dark
-   screenshots** as a workflow artifact.
+| Workflow | Trigger | Output |
+|---|---|---|
+| `build` | every push | light + dark simulator screenshots, as a run artifact |
+| `testflight` | manual, or a `v*` tag | signed IPA uploaded to TestFlight |
 
-That makes the UI reviewable without a Mac. It is slow, not blind.
-
-No `.xcodeproj` is committed — `project.yml` is the source of truth and the project is
-generated in CI.
+Signing is cloud-managed via an App Store Connect API key. Required repo secrets:
+`ASC_KEY_ID`, `ASC_ISSUER_ID`, `ASC_KEY_P8`, `ASC_TEAM_ID`, and the `BUNDLE_ID` variable.
 
 ## Status
 
