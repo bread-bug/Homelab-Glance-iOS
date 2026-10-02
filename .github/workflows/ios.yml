@@ -2,7 +2,12 @@ name: build
 
 on:
   push:
+    paths-ignore: ["**.md"]
   workflow_dispatch:
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -57,12 +62,12 @@ jobs:
           xcrun simctl launch "$SIM_UDID" "$BUNDLE_ID"
 
           # give SwiftUI a moment to render before capturing
-          sleep 5
+          sleep 3
           mkdir -p screenshots
           xcrun simctl io "$SIM_UDID" screenshot screenshots/light.png
 
           xcrun simctl ui "$SIM_UDID" appearance dark
-          sleep 3
+          sleep 2
           xcrun simctl io "$SIM_UDID" screenshot screenshots/dark.png
 
       - uses: actions/upload-artifact@v4
