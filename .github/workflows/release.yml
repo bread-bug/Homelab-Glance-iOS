@@ -18,6 +18,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Select newest Xcode and report SDKs
+        run: |
+          ls -d /Applications/Xcode*.app
+          NEWEST=$(ls -d /Applications/Xcode*.app | sort -V | tail -1)
+          sudo xcode-select -s "$NEWEST"
+          xcodebuild -version
+          xcodebuild -showsdks | grep -i ios || true
+
       - name: Install XcodeGen
         run: brew install xcodegen
 
