@@ -23,6 +23,7 @@ targets:
       properties:
         CFBundleDisplayName: Homelab Glance
         CFBundleIconName: AppIcon
+        ITSAppUsesNonExemptEncryption: false
         UILaunchScreen: {}
         UIApplicationSceneManifest:
           UIApplicationSupportsMultipleScenes: false
