@@ -32,6 +32,7 @@ jobs:
 
       # Device names change with every runner image; resolve one at runtime instead.
       - name: Pick a simulator
+        if: github.event_name == 'workflow_dispatch'
         run: |
           UDID=$(xcrun simctl list devices available -j \
             | python3 -c "import json,sys;ds=json.load(sys.stdin)['devices'];print(next(d['udid'] for rt in sorted(ds) for d in ds[rt] if d['name'].startswith('iPhone')))")
@@ -46,12 +47,13 @@ jobs:
             -scheme "$SCHEME" \
             -configuration Debug \
             -sdk iphonesimulator \
-            -destination "id=$SIM_UDID" \
+            -destination "generic/platform=iOS Simulator" \
             -derivedDataPath build \
             CODE_SIGNING_ALLOWED=NO \
             | xcbeautify
 
       - name: Boot simulator and screenshot
+        if: github.event_name == 'workflow_dispatch'
         run: |
           xcrun simctl boot "$SIM_UDID"
           xcrun simctl bootstatus "$SIM_UDID" -b
@@ -71,7 +73,7 @@ jobs:
           xcrun simctl io "$SIM_UDID" screenshot screenshots/dark.png
 
       - uses: actions/upload-artifact@v4
-        if: always()
+        if: github.event_name == 'workflow_dispatch'
         with:
           name: screenshots
           path: screenshots/
