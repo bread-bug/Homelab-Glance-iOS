@@ -21,6 +21,8 @@ targets:
       base:
         TARGETED_DEVICE_FAMILY: "1,2"
         PRODUCT_BUNDLE_IDENTIFIER: dev.breadbug.HomelabGlance
+        DEVELOPMENT_TEAM: ${DEVELOPMENT_TEAM}
+        PROVISIONING_PROFILE_SPECIFIER: ${PROFILE_NAME}
     entitlements:
       path: Sources/HomelabGlance.entitlements
       properties:
@@ -53,6 +55,8 @@ targets:
       base:
         TARGETED_DEVICE_FAMILY: "1,2"
         PRODUCT_BUNDLE_IDENTIFIER: dev.breadbug.HomelabGlance.Share
+        DEVELOPMENT_TEAM: ${DEVELOPMENT_TEAM}
+        PROVISIONING_PROFILE_SPECIFIER: ${PROFILE_NAME_EXT}
     entitlements:
       path: ShareExtension/GlanceShare.entitlements
       properties:

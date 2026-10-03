@@ -15,6 +15,8 @@ jobs:
       ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
       ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
       PROFILE_NAME: ${{ vars.PROFILE_NAME }}
+      PROFILE_NAME_EXT: ${{ vars.PROFILE_NAME_EXT }}
+      EXT_BUNDLE_ID: ${{ vars.EXT_BUNDLE_ID }}
 
     steps:
       - uses: actions/checkout@v4
@@ -32,6 +34,8 @@ jobs:
         run: brew install xcodegen
 
       - name: Generate Xcode project
+        env:
+          DEVELOPMENT_TEAM: ${{ secrets.ASC_TEAM_ID }}
         run: xcodegen generate
 
       # A runner starts with an empty keychain, so the identity is imported each
@@ -41,6 +45,7 @@ jobs:
           CERT_P12: ${{ secrets.BUILD_CERT_P12 }}
           CERT_PASSWORD: ${{ secrets.BUILD_CERT_PASSWORD }}
           PROVISION_PROFILE: ${{ secrets.BUILD_PROVISION_PROFILE }}
+          PROVISION_PROFILE_EXT: ${{ secrets.BUILD_PROVISION_PROFILE_EXT }}
         run: |
           set -euo pipefail
           KEYCHAIN="$RUNNER_TEMP/signing.keychain-db"
@@ -59,11 +64,15 @@ jobs:
             -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN" >/dev/null
           security list-keychains -d user -s "$KEYCHAIN" $(security list-keychains -d user | tr -d '"')
 
+          echo "$PROVISION_PROFILE_EXT" | base64 --decode > "$RUNNER_TEMP/profile_ext.mobileprovision"
+
           mkdir -p "$HOME/Library/MobileDevice/Provisioning Profiles"
-          UUID=$(/usr/libexec/PlistBuddy -c 'Print :UUID' /dev/stdin \
-            <<< "$(security cms -D -i "$RUNNER_TEMP/profile.mobileprovision")")
-          cp "$RUNNER_TEMP/profile.mobileprovision" \
-            "$HOME/Library/MobileDevice/Provisioning Profiles/$UUID.mobileprovision"
+          for p in profile profile_ext; do
+            UUID=$(/usr/libexec/PlistBuddy -c 'Print :UUID' /dev/stdin \
+              <<< "$(security cms -D -i "$RUNNER_TEMP/$p.mobileprovision")")
+            cp "$RUNNER_TEMP/$p.mobileprovision" \
+              "$HOME/Library/MobileDevice/Provisioning Profiles/$UUID.mobileprovision"
+          done
 
           rm -f "$RUNNER_TEMP/cert.p12"
           echo "codesigning identities imported: $(security find-identity -v -p codesigning "$KEYCHAIN" | grep -c 'valid identities found' || true)"
@@ -106,11 +115,8 @@ jobs:
             -configuration Release \
             -destination 'generic/platform=iOS' \
             -archivePath build/$SCHEME.xcarchive \
-            PRODUCT_BUNDLE_IDENTIFIER="$BUNDLE_ID" \
-            DEVELOPMENT_TEAM="$TEAM_ID" \
             CODE_SIGN_STYLE=Manual \
             CODE_SIGN_IDENTITY="Apple Distribution" \
-            PROVISIONING_PROFILE_SPECIFIER="$PROFILE_NAME" \
             CURRENT_PROJECT_VERSION="$BUILD_NUMBER" \
             | xcbeautify
 
@@ -127,6 +133,7 @@ jobs:
           /usr/libexec/PlistBuddy -c "Add :signingCertificate string Apple Distribution" ExportOptions.plist
           /usr/libexec/PlistBuddy -c "Add :provisioningProfiles dict" ExportOptions.plist
           /usr/libexec/PlistBuddy -c "Add :provisioningProfiles:$BUNDLE_ID string $PROFILE_NAME" ExportOptions.plist
+          /usr/libexec/PlistBuddy -c "Add :provisioningProfiles:$EXT_BUNDLE_ID string $PROFILE_NAME_EXT" ExportOptions.plist
           xcodebuild -exportArchive \
             -archivePath build/$SCHEME.xcarchive \
             -exportPath build/ipa \
