@@ -22,6 +22,9 @@ targets:
       path: Sources/Info.plist
       properties:
         CFBundleDisplayName: Glance
+        # without these the generated plist hardcodes 1 and ignores the build settings
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleIconName: AppIcon
         ITSAppUsesNonExemptEncryption: false
         UILaunchScreen: {}
