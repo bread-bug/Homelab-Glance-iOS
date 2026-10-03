@@ -61,7 +61,7 @@ jobs:
           APP=build/Build/Products/Debug-iphonesimulator/$SCHEME.app
           BUNDLE_ID=$(/usr/libexec/PlistBuddy -c "Print :CFBundleIdentifier" "$APP/Info.plist")
           xcrun simctl install "$SIM_UDID" "$APP"
-          xcrun simctl launch "$SIM_UDID" "$BUNDLE_ID"
+          xcrun simctl launch "$SIM_UDID" "$BUNDLE_ID" --sample
 
           # give SwiftUI a moment to render before capturing
           sleep 3
