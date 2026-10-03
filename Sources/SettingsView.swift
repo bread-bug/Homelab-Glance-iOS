@@ -10,13 +10,15 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Connection") {
+                Section {
                     TextField("https://glance.example.com", text: $settings.baseURL)
                         .textContentType(.URL)
                         .keyboardType(.URL)
                         .autocorrectionDisabled()
                         .textInputAutocapitalization(.never)
                     SecureField("API key", text: $settings.apiKey)
+                } header: {
+                    Text("Connection")
                 } footer: {
                     Text("Scheme and host only, with no trailing slash.")
                 }

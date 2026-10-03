@@ -42,6 +42,7 @@ jobs:
 
       - name: Build for simulator
         run: |
+          set -o pipefail
           # a generic destination builds no runnable binary, so target the picked sim
           DEST="generic/platform=iOS Simulator"
           [ -n "${SIM_UDID:-}" ] && DEST="id=$SIM_UDID"
