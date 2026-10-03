@@ -42,12 +42,15 @@ jobs:
 
       - name: Build for simulator
         run: |
+          # a generic destination builds no runnable binary, so target the picked sim
+          DEST="generic/platform=iOS Simulator"
+          [ -n "${SIM_UDID:-}" ] && DEST="id=$SIM_UDID"
           xcodebuild build \
             -project HomelabGlance.xcodeproj \
             -scheme "$SCHEME" \
             -configuration Debug \
             -sdk iphonesimulator \
-            -destination "generic/platform=iOS Simulator" \
+            -destination "$DEST" \
             -derivedDataPath build \
             CODE_SIGNING_ALLOWED=NO \
             | xcbeautify
