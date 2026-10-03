@@ -32,13 +32,15 @@
   command string — so the container can start a known job but cannot express one.
 - Actions: `host-uptime`, `backup-now`, `backup-immich-retry` (command);
   AdGuard pause 5/30, AdGuard resume, aggregator ingest (HTTP).
-- Verified on the host: `host-uptime` returned exit 0 with output; `rm-rf` → 404.
+- Verified on the host: `host-uptime` exit 0 with output, `rm-rf` → 404,
+  aggregator refresh → `202 queued`, AdGuard resume → `200 OK`.
+- AdGuard is reached on its own docker network, not through nginx: the public host is
+  behind Authentik, which would intercept any API call.
 
 ## Not done
 
 - Backend is **not deployed** — see `homelab-api/README.md` for the remaining host steps
   (socket-proxy allowfrom, nginx vhost, `.env`, `DEPLOY_ENABLED`).
 - No capture/share extension, widget, or push.
-- AdGuard and aggregator actions need `ADGUARD_URL`, `ADGUARD_AUTH`, `AGGREGATOR_URL`
-  and `AGGREGATOR_KEY` in the server `.env`; until then they fail cleanly.
+- Action credentials are configured in the server `.env`; unconfigured ones fail cleanly.
 - Backup data is parsed from existing logs; the backup script is unmodified.

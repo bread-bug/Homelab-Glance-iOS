@@ -28,7 +28,7 @@ enum SampleData {
         {"id":"adguard-pause-5","label":"Pause AdGuard 5 min","description":"Disables filtering, then it re-enables itself","kind":"http","confirm":false},
         {"id":"adguard-pause-30","label":"Pause AdGuard 30 min","kind":"http","confirm":true},
         {"id":"adguard-resume","label":"Resume AdGuard","kind":"http","confirm":false},
-        {"id":"aggregator-ingest","label":"Run aggregator ingest","description":"Triggers a Webnovel Aggregator refresh","kind":"http","confirm":false}
+        {"id":"aggregator-recommendations","label":"Refresh recommendations","description":"Webnovel Aggregator recommendation rebuild","kind":"http","confirm":false}
       ]
     }
     """
