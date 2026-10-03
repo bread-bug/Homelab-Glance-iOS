@@ -70,15 +70,33 @@ jobs:
         run: |
           mkdir -p ~/private_keys
           echo "${{ secrets.ASC_KEY_P8 }}" > ~/private_keys/AuthKey_${ASC_KEY_ID}.p8
+          # fastlane wants the same credentials as json
+          python3 - <<'PY' > "$RUNNER_TEMP/asc_key.json"
+          import json, os
+          print(json.dumps({
+              "key_id": os.environ["ASC_KEY_ID"],
+              "issuer_id": os.environ["ASC_ISSUER_ID"],
+              "key": open(os.path.expanduser(f"~/private_keys/AuthKey_{os.environ['ASC_KEY_ID']}.p8")).read(),
+              "in_house": False,
+          }))
+          PY
+
+      - name: Next build number
+        run: |
+          set -euo pipefail
+          # ask App Store Connect what was last uploaded so numbering stays
+          # sequential instead of depending on CI run counters
+          LATEST=$(fastlane run latest_testflight_build_number \
+            app_identifier:"$BUNDLE_ID" \
+            api_key_path:"$RUNNER_TEMP/asc_key.json" \
+            initial_build_number:0 2>&1 | grep -oE 'Result: *[0-9]+' | grep -oE '[0-9]+' | tail -1)
+          echo "BUILD_NUMBER=$(( LATEST + 1 ))" >> "$GITHUB_ENV"
+          echo "latest uploaded: $LATEST"
 
       - name: Archive
         run: |
           set -o pipefail
-          # run numbers restart per workflow and collide with builds already
-          # uploaded; epoch seconds always increase and stay under apple's 2^32
-          # per-component limit
-          BUILD_NUMBER=$(date -u +%s)
-          echo "build number: $BUILD_NUMBER"
+          echo "building $BUILD_NUMBER"
           xcodebuild archive \
             -project HomelabGlance.xcodeproj \
             -scheme "$SCHEME" \
