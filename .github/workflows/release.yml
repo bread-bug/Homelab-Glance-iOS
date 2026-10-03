@@ -40,6 +40,8 @@ jobs:
 
       - name: Archive
         run: |
+          # without this a failed xcodebuild is masked by xcbeautify's exit code
+          set -o pipefail
           xcodebuild archive \
             -project HomelabGlance.xcodeproj \
             -scheme "$SCHEME" \
