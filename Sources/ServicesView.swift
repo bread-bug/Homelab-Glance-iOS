@@ -38,7 +38,7 @@ final class ServicesStore {
             if case .loaded = state { return }
             consecutiveFailures += 1
             if consecutiveFailures >= 2 {
-                state = .failed(error.localizedDescription)
+                state = .failed("attempt \(consecutiveFailures)\n" + errorDetail(error))
             } else {
                 state = .loading
                 try? await Task.sleep(for: .seconds(1))
@@ -77,7 +77,7 @@ struct ServicesView: View {
                 ContentUnavailableView {
                     Label("Can't load services", systemImage: "exclamationmark.triangle")
                 } description: {
-                    Text(message)
+                    Text(message).font(.caption.monospaced())
                 } actions: {
                     Button("Retry") { Task { await store.load() } }
                 }

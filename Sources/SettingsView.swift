@@ -33,6 +33,10 @@ struct SettingsView: View {
                         Text(testResult).font(.caption)
                     }
                 }
+
+                Section {
+                    LabeledContent("Version", value: AppVersion.display)
+                }
             }
             .navigationTitle("Settings")
             .toolbar {
