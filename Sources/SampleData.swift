@@ -7,6 +7,13 @@ enum SampleData {
         ProcessInfo.processInfo.arguments.contains("--sample")
     }
 
+    /// Screen to open directly, from `--screen <name>`.
+    static var screen: String? {
+        let args = ProcessInfo.processInfo.arguments
+        guard let i = args.firstIndex(of: "--screen"), i + 1 < args.count else { return nil }
+        return args[i + 1]
+    }
+
     static func services() -> [Service]? {
         guard let data = servicesJSON.data(using: .utf8) else { return nil }
         return try? APIClient.decoder.decode(ServiceList.self, from: data).services
