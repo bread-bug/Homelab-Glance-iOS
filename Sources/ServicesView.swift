@@ -32,17 +32,19 @@ final class ServicesStore {
         }
     }
 
+    /// Fires the restart and returns at once; the row shows it in flight and the
+    /// next poll reflects the real state.
     @MainActor
-    func restart(_ service: Service) async {
+    func restart(_ service: Service) {
         restarting.insert(service.name)
-        defer { restarting.remove(service.name) }
-        do {
-            try await settings.client.restart(service: service.name)
-            // docker needs a moment before the new state is visible
-            try? await Task.sleep(for: .seconds(2))
+        Task {
+            do {
+                try await settings.client.restart(service: service.name)
+            } catch {
+                lastError = error.localizedDescription
+            }
             await load()
-        } catch {
-            lastError = error.localizedDescription
+            restarting.remove(service.name)
         }
     }
 }
@@ -107,10 +109,19 @@ struct ServicesView: View {
         } label: {
             HStack(spacing: 10) {
                 ServiceDot(service: service)
-                Text(service.name)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(service.name)
+                    if service.hasStats {
+                        Text(usageText(service))
+                            .font(.caption.monospacedDigit())
+                            .foregroundStyle(.secondary)
+                    }
+                }
                 Spacer()
                 if store.restarting.contains(service.name) {
-                    ProgressView()
+                    Text("restarting")
+                        .font(.caption)
+                        .foregroundStyle(.orange)
                 } else {
                     Text(service.stateLabel)
                         .font(.caption)
@@ -119,6 +130,12 @@ struct ServicesView: View {
             }
         }
     }
+}
+
+func usageText(_ service: Service) -> String {
+    let cpu = String(format: "%.1f%%", service.cpuPercent ?? 0)
+    let mem = ByteCountFormatter.string(fromByteCount: Int64(service.memUsage ?? 0), countStyle: .memory)
+    return "\(cpu) · \(mem)"
 }
 
 struct ServiceDot: View {
@@ -157,6 +174,16 @@ struct ServiceDetailView: View {
                 }
             }
 
+            if service.hasStats {
+                Section("Usage") {
+                    LabeledContent("CPU", value: String(format: "%.1f%%", service.cpuPercent ?? 0))
+                    LabeledContent(
+                        "Memory",
+                        value: ByteCountFormatter.string(fromByteCount: Int64(service.memUsage ?? 0), countStyle: .memory)
+                    )
+                }
+            }
+
             Section {
                 if let image = service.image {
                     LabeledContent("Image", value: image)
@@ -183,7 +210,7 @@ struct ServiceDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
         .confirmationDialog("Restart \(service.name)?", isPresented: $confirming, titleVisibility: .visible) {
             Button("Restart", role: .destructive) {
-                Task { await store.restart(service) }
+                store.restart(service)
             }
             Button("Cancel", role: .cancel) {}
         }

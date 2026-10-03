@@ -51,8 +51,13 @@ struct Service: Decodable, Identifiable {
     let image: String?
     let project: String?
     let createdAt: Date?
+    let cpuPercent: Double?
+    let memUsage: UInt64?
+    let memLimit: UInt64?
 
     var id: String { name }
+
+    var hasStats: Bool { (memUsage ?? 0) > 0 }
 
     var isRunning: Bool { state == "running" }
     var needsAttention: Bool { !isRunning || health == "unhealthy" }

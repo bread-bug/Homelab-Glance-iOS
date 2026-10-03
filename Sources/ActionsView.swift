@@ -4,7 +4,7 @@ import SwiftUI
 final class ActionsStore {
     private(set) var actions: [HomelabAction] = []
     private(set) var loadError: String?
-    private(set) var runningID: String?
+    private(set) var running: Set<String> = []
     var job: Job?
 
     private let settings: AppSettings
@@ -27,23 +27,27 @@ final class ActionsStore {
         }
     }
 
+    /// Fires immediately and tracks the job in the background, so the tap never
+    /// waits on the network and other actions stay usable.
     @MainActor
-    func run(_ action: HomelabAction) async {
-        runningID = action.id
-        defer { runningID = nil }
-        do {
-            var current = try await settings.client.run(action: action.id)
-            job = current
-
-            // command actions finish later; poll until they settle
-            let deadline = Date().addingTimeInterval(600)
-            while current.isRunning, Date() < deadline {
-                try await Task.sleep(for: .seconds(2))
-                current = try await settings.client.job(id: current.id)
+    func run(_ action: HomelabAction) {
+        running.insert(action.id)
+        Task {
+            defer { running.remove(action.id) }
+            do {
+                var current = try await settings.client.run(action: action.id)
                 job = current
+
+                // command actions finish later; poll until they settle
+                let deadline = Date().addingTimeInterval(1800)
+                while current.isRunning, Date() < deadline {
+                    try await Task.sleep(for: .seconds(2))
+                    current = try await settings.client.job(id: current.id)
+                    job = current
+                }
+            } catch {
+                loadError = error.localizedDescription
             }
-        } catch {
-            loadError = error.localizedDescription
         }
     }
 }
@@ -76,14 +80,13 @@ struct ActionsView: View {
                         if action.needsConfirmation {
                             pending = action
                         } else {
-                            Task { await store.run(action) }
+                            store.run(action)
                         }
                     } label: {
                         row(action)
                     }
                     .buttonStyle(.plain)
                     .contentShape(.rect)
-                    .disabled(store.runningID != nil)
                 }
             }
         }
@@ -97,7 +100,7 @@ struct ActionsView: View {
         ) {
             if let action = pending {
                 Button(action.label) {
-                    Task { await store.run(action) }
+                    store.run(action)
                     pending = nil
                 }
             }
@@ -114,8 +117,10 @@ struct ActionsView: View {
                 }
             }
             Spacer()
-            if store.runningID == action.id {
-                ProgressView()
+            if store.running.contains(action.id) {
+                Text("running")
+                    .font(.caption)
+                    .foregroundStyle(.orange)
             } else {
                 Image(systemName: "chevron.right")
                     .font(.caption.weight(.semibold))

@@ -22,7 +22,7 @@ struct GlanceView: View {
                 .sheet(isPresented: $showingSettings) {
                     SettingsView(settings: settings)
                 }
-                .autoRefresh { await store.load() }
+                .whileVisible { await store.run() }
         }
     }
 

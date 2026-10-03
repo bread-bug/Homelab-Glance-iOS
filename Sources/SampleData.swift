@@ -41,14 +41,14 @@ enum SampleData {
     static let servicesJSON = """
     {
       "services": [
-        {"name":"flaresolverr","state":"running","health":"unhealthy","status":"Up 3 hours (unhealthy)","image":"flaresolverr:latest","project":"flaresolverr","created_at":"2026-10-03T08:00:00+05:30"},
-        {"name":"adguardhome","state":"running","status":"Up 6 hours","image":"adguard/adguardhome:latest","project":"adguard","created_at":"2026-10-03T05:30:00+05:30"},
-        {"name":"authentik-server-1","state":"running","health":"healthy","status":"Up 6 hours (healthy)","image":"authentik:2026.8","project":"authentik","created_at":"2026-10-03T05:30:00+05:30"},
-        {"name":"immich_server","state":"running","health":"healthy","status":"Up 6 hours (healthy)","image":"immich-server:v1.140","project":"immich","created_at":"2026-10-03T05:30:00+05:30"},
-        {"name":"kavita","state":"running","health":"healthy","status":"Up 6 hours (healthy)","image":"kavita:latest","project":"kavita","created_at":"2026-10-03T05:30:00+05:30"},
-        {"name":"ntfy","state":"running","status":"Up 6 hours","image":"binwiederhier/ntfy:latest","project":"ntfy","created_at":"2026-10-03T05:30:00+05:30"},
-        {"name":"uptime-kuma","state":"running","health":"healthy","status":"Up 6 hours (healthy)","image":"uptime-kuma:1","project":"uptimekuma","created_at":"2026-10-03T05:30:00+05:30"},
-        {"name":"webnovel-aggregator","state":"running","status":"Up 2 minutes","image":"webnovel-aggregator:local","project":"webnovel-aggregator","created_at":"2026-10-03T17:35:00+05:30"}
+        {"name":"flaresolverr","state":"running","health":"unhealthy","status":"Up 3 hours (unhealthy)","image":"flaresolverr:latest","project":"flaresolverr","created_at":"2026-10-03T08:00:00+05:30","cpu_percent":0.4,"mem_usage":212000000,"mem_limit":16600000000},
+        {"name":"adguardhome","state":"running","status":"Up 6 hours","image":"adguard/adguardhome:latest","project":"adguard","created_at":"2026-10-03T05:30:00+05:30","cpu_percent":1.2,"mem_usage":96000000,"mem_limit":16600000000},
+        {"name":"authentik-server-1","state":"running","health":"healthy","status":"Up 6 hours (healthy)","image":"authentik:2026.8","project":"authentik","created_at":"2026-10-03T05:30:00+05:30","cpu_percent":0.7,"mem_usage":821000000,"mem_limit":16600000000},
+        {"name":"immich_server","state":"running","health":"healthy","status":"Up 6 hours (healthy)","image":"immich-server:v1.140","project":"immich","created_at":"2026-10-03T05:30:00+05:30","cpu_percent":0.1,"mem_usage":853000000,"mem_limit":16600000000},
+        {"name":"kavita","state":"running","health":"healthy","status":"Up 6 hours (healthy)","image":"kavita:latest","project":"kavita","created_at":"2026-10-03T05:30:00+05:30","cpu_percent":0.7,"mem_usage":473000000,"mem_limit":16600000000},
+        {"name":"ntfy","state":"running","status":"Up 6 hours","image":"binwiederhier/ntfy:latest","project":"ntfy","created_at":"2026-10-03T05:30:00+05:30","cpu_percent":0.0,"mem_usage":18000000,"mem_limit":16600000000},
+        {"name":"uptime-kuma","state":"running","health":"healthy","status":"Up 6 hours (healthy)","image":"uptime-kuma:1","project":"uptimekuma","created_at":"2026-10-03T05:30:00+05:30","cpu_percent":0.3,"mem_usage":158000000,"mem_limit":16600000000},
+        {"name":"webnovel-aggregator","state":"running","status":"Up 2 minutes","image":"webnovel-aggregator:local","project":"webnovel-aggregator","created_at":"2026-10-03T17:35:00+05:30","cpu_percent":0.2,"mem_usage":64000000,"mem_limit":16600000000}
       ]
     }
     """
