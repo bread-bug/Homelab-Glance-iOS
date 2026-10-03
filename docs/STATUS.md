@@ -37,6 +37,15 @@
 - AdGuard is reached on its own docker network, not through nginx: the public host is
   behind Authentik, which would intercept any API call.
 
+## Live updates
+
+- Glance holds an **SSE connection** while on screen and active, so it updates without
+  being touched; it falls back to polling if the stream drops and retries shortly after.
+- Services polls every 15s. Both stop when the app is backgrounded.
+- Per-service CPU and memory in the list and detail views.
+- Actions and restart are **fire-and-forget**: the tap returns immediately, the row
+  shows "running"/"restarting", and other actions stay usable while one is in flight.
+
 ## Not done
 
 - Backend is **not deployed** — see `homelab-api/README.md` for the remaining host steps
