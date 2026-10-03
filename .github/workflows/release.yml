@@ -74,9 +74,11 @@ jobs:
       - name: Archive
         run: |
           set -o pipefail
-          # run numbers restart per workflow and can collide with builds already
-          # uploaded; a timestamp only ever goes up
-          BUILD_NUMBER=$(date -u +%Y%m%d%H%M)
+          # run numbers restart per workflow and collide with builds already
+          # uploaded; epoch seconds always increase and stay under apple's 2^32
+          # per-component limit
+          BUILD_NUMBER=$(date -u +%s)
+          echo "build number: $BUILD_NUMBER"
           xcodebuild archive \
             -project HomelabGlance.xcodeproj \
             -scheme "$SCHEME" \
@@ -90,6 +92,11 @@ jobs:
             PROVISIONING_PROFILE_SPECIFIER="$PROFILE_NAME" \
             CURRENT_PROJECT_VERSION="$BUILD_NUMBER" \
             | xcbeautify
+
+      - name: Confirm bundle version
+        run: |
+          /usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' \
+            "build/$SCHEME.xcarchive/Products/Applications/$SCHEME.app/Info.plist"
 
       - name: Export IPA
         run: |
