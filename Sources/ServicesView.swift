@@ -28,6 +28,9 @@ final class ServicesStore {
             let list = try await settings.client.services()
             state = .loaded(list.services)
         } catch {
+            if isCancellation(error) { return }
+            // keep showing what we have; only an empty screen becomes an error
+            if case .loaded = state { return }
             state = .failed(error.localizedDescription)
         }
     }

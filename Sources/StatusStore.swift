@@ -38,6 +38,7 @@ final class StatusStore {
                 live = false
             } catch {
                 live = false
+                if isCancellation(error) { return }
                 if case .loaded = state {} else {
                     state = .failed(error.localizedDescription)
                 }
@@ -67,6 +68,8 @@ final class StatusStore {
             state = .loaded(status)
             lastUpdated = Date()
         } catch {
+            if isCancellation(error) { return }
+            if case .loaded = state { return }
             state = .failed(error.localizedDescription)
         }
     }
