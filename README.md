@@ -17,6 +17,9 @@ generates the project in CI.
 Signing is cloud-managed via an App Store Connect API key. Required repo secrets:
 `ASC_KEY_ID`, `ASC_ISSUER_ID`, `ASC_KEY_P8`, `ASC_TEAM_ID`, and the `BUNDLE_ID` variable.
 
+Pass `--sample` at launch to render representative data without a server:
+`xcrun simctl launch <udid> <bundle-id> --sample`.
+
 ## Status
 
-Scaffold with placeholder data. No Proxmox API wiring yet.
+See [docs/STATUS.md](docs/STATUS.md).
