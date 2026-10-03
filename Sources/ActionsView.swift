@@ -70,7 +70,7 @@ struct ActionsView: View {
                 }
             }
 
-            Section("Actions") {
+            Section {
                 ForEach(store.actions) { action in
                     Button {
                         if action.needsConfirmation {
@@ -81,6 +81,8 @@ struct ActionsView: View {
                     } label: {
                         row(action)
                     }
+                    .buttonStyle(.plain)
+                    .contentShape(.rect)
                     .disabled(store.runningID != nil)
                 }
             }
@@ -114,6 +116,10 @@ struct ActionsView: View {
             Spacer()
             if store.runningID == action.id {
                 ProgressView()
+            } else {
+                Image(systemName: "chevron.right")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.tertiary)
             }
         }
     }

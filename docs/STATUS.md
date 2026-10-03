@@ -23,9 +23,22 @@
 - Home screen name shortened to **Glance**.
 - CI screenshots the services screen too, via `--sample --screen services`.
 
+## M2 — done
+
+- **Actions screen** with confirmation on destructive ones, a spinner while running,
+  and a job detail view showing exit code and output tail.
+- **Host agent** (`cmd/homelab-agent`, systemd, root) on a unix socket mounted into the
+  API container. It accepts an **action ID from a compiled-in allowlist** — never a
+  command string — so the container can start a known job but cannot express one.
+- Actions: `host-uptime`, `backup-now`, `backup-immich-retry` (command);
+  AdGuard pause 5/30, AdGuard resume, aggregator ingest (HTTP).
+- Verified on the host: `host-uptime` returned exit 0 with output; `rm-rf` → 404.
+
 ## Not done
 
 - Backend is **not deployed** — see `homelab-api/README.md` for the remaining host steps
   (socket-proxy allowfrom, nginx vhost, `.env`, `DEPLOY_ENABLED`).
-- No actions screen, capture/share extension, widget, or push.
+- No capture/share extension, widget, or push.
+- AdGuard and aggregator actions need `ADGUARD_URL`, `ADGUARD_AUTH`, `AGGREGATOR_URL`
+  and `AGGREGATOR_KEY` in the server `.env`; until then they fail cleanly.
 - Backup data is parsed from existing logs; the backup script is unmodified.
