@@ -4,7 +4,7 @@ import SwiftUI
 struct HomelabGlanceApp: App {
     var body: some Scene {
         WindowGroup {
-            BackupListView()
+            GlanceView()
         }
     }
 }
