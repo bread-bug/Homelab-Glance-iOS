@@ -12,6 +12,10 @@ final class ServicesStore {
     private(set) var restarting: Set<String> = []
     var lastError: String?
 
+    // One failure on an empty screen is usually a restarted task or a slow
+    // first connection; only a second one is worth showing.
+    private var consecutiveFailures = 0
+
     private let settings: AppSettings
 
     init(settings: AppSettings = .shared) {
@@ -27,11 +31,19 @@ final class ServicesStore {
         do {
             let list = try await settings.client.services()
             state = .loaded(list.services)
+            consecutiveFailures = 0
         } catch {
             if isCancellation(error) { return }
             // keep showing what we have; only an empty screen becomes an error
             if case .loaded = state { return }
-            state = .failed(error.localizedDescription)
+            consecutiveFailures += 1
+            if consecutiveFailures >= 2 {
+                state = .failed(error.localizedDescription)
+            } else {
+                state = .loading
+                try? await Task.sleep(for: .seconds(1))
+                await load()
+            }
         }
     }
 

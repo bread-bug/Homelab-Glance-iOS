@@ -5,5 +5,7 @@ import Foundation
 func isCancellation(_ error: Error) -> Bool {
     if error is CancellationError { return true }
     if let urlError = error as? URLError, urlError.code == .cancelled { return true }
+    if (error as NSError).domain == NSURLErrorDomain,
+       (error as NSError).code == NSURLErrorCancelled { return true }
     return false
 }

@@ -32,7 +32,7 @@ struct EventStream {
                     }
                     continuation.finish()
                 } catch {
-                    continuation.finish(throwing: error)
+                    continuation.finish(throwing: isCancellation(error) ? CancellationError() : error)
                 }
             }
             continuation.onTermination = { _ in task.cancel() }

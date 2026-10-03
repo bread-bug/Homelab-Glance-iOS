@@ -69,6 +69,9 @@ struct APIClient {
         do {
             (data, response) = try await URLSession.shared.data(for: request)
         } catch {
+            // Preserve cancellation: wrapping it in APIError would erase the type
+            // and make a restarted task look like a server failure.
+            if isCancellation(error) { throw CancellationError() }
             throw APIError.transport(error.localizedDescription)
         }
 
