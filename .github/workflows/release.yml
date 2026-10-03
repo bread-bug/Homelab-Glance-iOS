@@ -14,7 +14,7 @@ jobs:
       TEAM_ID: ${{ secrets.ASC_TEAM_ID }}
       ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
       ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
-      PROFILE_NAME: Homelab-Glance
+      PROFILE_NAME: ${{ vars.PROFILE_NAME }}
 
     steps:
       - uses: actions/checkout@v4
@@ -63,7 +63,8 @@ jobs:
             "$HOME/Library/MobileDevice/Provisioning Profiles/$UUID.mobileprovision"
 
           rm -f "$RUNNER_TEMP/cert.p12"
-          security find-identity -v -p codesigning "$KEYCHAIN" | sed 's/[0-9A-F]\{40\}/<hash>/'
+          echo "codesigning identities imported: $(security find-identity -v -p codesigning "$KEYCHAIN" | grep -c 'valid identities found' || true)"
+          security find-identity -v -p codesigning "$KEYCHAIN" | tail -1
 
       - name: Write App Store Connect API key
         run: |
