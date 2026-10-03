@@ -29,6 +29,20 @@ struct APIClient {
         _ = try await send(path: "/api/v1/services/\(encoded)/restart", method: "POST")
     }
 
+    func actions() async throws -> ActionList {
+        try await get("/api/v1/actions")
+    }
+
+    func run(action id: String) async throws -> Job {
+        let data = try await send(path: "/api/v1/actions/\(id)", method: "POST")
+        return try Self.decoder.decode(Job.self, from: data)
+    }
+
+    func job(id: String) async throws -> Job {
+        let encoded = id.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? id
+        return try await get("/api/v1/jobs/\(encoded)")
+    }
+
     func status() async throws -> Status {
         try await get("/api/v1/status")
     }

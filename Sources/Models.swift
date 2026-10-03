@@ -85,3 +85,34 @@ struct Disk: Decodable, Identifiable {
     var used: UInt64 { size > free ? size - free : 0 }
     var usedFraction: Double { size == 0 ? 0 : Double(used) / Double(size) }
 }
+
+struct HomelabAction: Decodable, Identifiable {
+    let id: String
+    let label: String
+    let description: String?
+    let kind: String
+    let confirm: Bool?
+
+    var needsConfirmation: Bool { confirm ?? false }
+}
+
+struct ActionList: Decodable {
+    let actions: [HomelabAction]
+}
+
+struct Job: Decodable, Identifiable {
+    let id: String
+    let action: String
+    let state: JobState
+    let startedAt: Date
+    let endedAt: Date?
+    let exitCode: Int?
+    let tail: [String]?
+    let error: String?
+
+    var isRunning: Bool { state == .running }
+}
+
+enum JobState: String, Decodable {
+    case running, succeeded, failed
+}

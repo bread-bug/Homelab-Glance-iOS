@@ -14,6 +14,25 @@ enum SampleData {
         return args[i + 1]
     }
 
+    static func actions() -> [HomelabAction]? {
+        guard let data = actionsJSON.data(using: .utf8) else { return nil }
+        return try? APIClient.decoder.decode(ActionList.self, from: data).actions
+    }
+
+    static let actionsJSON = """
+    {
+      "actions": [
+        {"id":"host-uptime","label":"Check host agent","description":"Runs uptime on the host; proves the agent path works","kind":"command","confirm":false},
+        {"id":"backup-now","label":"Run backup now","description":"Full selfhosted backup to Proton and B2","kind":"command","confirm":true},
+        {"id":"backup-immich-retry","label":"Retry Immich backup","description":"Re-runs the weekly Immich job","kind":"command","confirm":true},
+        {"id":"adguard-pause-5","label":"Pause AdGuard 5 min","description":"Disables filtering, then it re-enables itself","kind":"http","confirm":false},
+        {"id":"adguard-pause-30","label":"Pause AdGuard 30 min","kind":"http","confirm":true},
+        {"id":"adguard-resume","label":"Resume AdGuard","kind":"http","confirm":false},
+        {"id":"aggregator-ingest","label":"Run aggregator ingest","description":"Triggers a Webnovel Aggregator refresh","kind":"http","confirm":false}
+      ]
+    }
+    """
+
     static func services() -> [Service]? {
         guard let data = servicesJSON.data(using: .utf8) else { return nil }
         return try? APIClient.decoder.decode(ServiceList.self, from: data).services

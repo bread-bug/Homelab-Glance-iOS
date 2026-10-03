@@ -45,6 +45,13 @@ struct GlanceView: View {
                 BackupSection(backup: status.backup)
                 ServicesSection(services: status.services)
                 SystemSection(system: status.system)
+                Section {
+                    NavigationLink {
+                        ActionsView()
+                    } label: {
+                        Label("Actions", systemImage: "bolt")
+                    }
+                }
             }
         }
     }
