@@ -48,8 +48,22 @@ struct Service: Decodable, Identifiable {
     let state: String
     let health: String?
     let status: String?
+    let image: String?
+    let project: String?
+    let createdAt: Date?
 
     var id: String { name }
+
+    var isRunning: Bool { state == "running" }
+    var needsAttention: Bool { !isRunning || health == "unhealthy" }
+
+    /// Short label for the trailing edge of a row.
+    var stateLabel: String { health ?? state }
+}
+
+struct ServiceList: Decodable {
+    let services: [Service]
+    let error: String?
 }
 
 struct SystemInfo: Decodable {

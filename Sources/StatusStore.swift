@@ -21,15 +21,7 @@ final class StatusStore {
 
     private static func decodeSample() -> Status? {
         guard let data = SampleData.json.data(using: .utf8) else { return nil }
-        let decoder = JSONDecoder()
-        decoder.keyDecodingStrategy = .convertFromSnakeCase
-        decoder.dateDecodingStrategy = .custom { decoder in
-            let text = try decoder.singleValueContainer().decode(String.self)
-            return Date.iso8601WithFraction.date(from: text)
-                ?? Date.iso8601Plain.date(from: text)
-                ?? Date()
-        }
-        return try? decoder.decode(Status.self, from: data)
+        return try? APIClient.decoder.decode(Status.self, from: data)
     }
 
     @MainActor

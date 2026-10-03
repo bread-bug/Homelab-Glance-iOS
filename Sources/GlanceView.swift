@@ -137,7 +137,11 @@ struct ServicesSection: View {
                     .font(.caption)
                     .foregroundStyle(.red)
             } else {
-                LabeledContent("Running", value: "\(services.running) of \(services.total)")
+                NavigationLink {
+                    ServicesView()
+                } label: {
+                    LabeledContent("Running", value: "\(services.running) of \(services.total)")
+                }
                 if services.degraded.isEmpty {
                     Label("All healthy", systemImage: "checkmark.circle")
                         .foregroundStyle(.green)

@@ -20,15 +20,35 @@ struct APIClient {
     var baseURL: String
     var apiKey: String
 
+    func services() async throws -> ServiceList {
+        try await get("/api/v1/services")
+    }
+
+    func restart(service name: String) async throws {
+        let encoded = name.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? name
+        _ = try await send(path: "/api/v1/services/\(encoded)/restart", method: "POST")
+    }
+
     func status() async throws -> Status {
-        guard let url = URL(string: baseURL.trimmedTrailingSlash + "/api/v1/status"),
-              !baseURL.isEmpty, !apiKey.isEmpty else {
+        try await get("/api/v1/status")
+    }
+
+    private func get<T: Decodable>(_ path: String) async throws -> T {
+        let data = try await send(path: path, method: "GET")
+        return try Self.decoder.decode(T.self, from: data)
+    }
+
+    @discardableResult
+    private func send(path: String, method: String) async throws -> Data {
+        guard !baseURL.isEmpty, !apiKey.isEmpty,
+              let url = URL(string: baseURL.trimmedTrailingSlash + path) else {
             throw APIError.notConfigured
         }
 
         var request = URLRequest(url: url)
+        request.httpMethod = method
         request.setValue(apiKey, forHTTPHeaderField: "X-API-Key")
-        request.timeoutInterval = 15
+        request.timeoutInterval = 30
 
         let data: Data
         let response: URLResponse
@@ -38,10 +58,13 @@ struct APIClient {
             throw APIError.transport(error.localizedDescription)
         }
 
-        if let http = response as? HTTPURLResponse, http.statusCode != 200 {
+        if let http = response as? HTTPURLResponse, !(200..<300).contains(http.statusCode) {
             throw http.statusCode == 401 ? APIError.unauthorized : APIError.server(http.statusCode)
         }
+        return data
+    }
 
+    static let decoder: JSONDecoder = {
         let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .convertFromSnakeCase
         decoder.dateDecodingStrategy = .custom { decoder in
@@ -52,8 +75,8 @@ struct APIClient {
             throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath,
                                                     debugDescription: "bad date: \(text)"))
         }
-        return try decoder.decode(Status.self, from: data)
-    }
+        return decoder
+    }()
 }
 
 extension String {

@@ -7,6 +7,26 @@ enum SampleData {
         ProcessInfo.processInfo.arguments.contains("--sample")
     }
 
+    static func services() -> [Service]? {
+        guard let data = servicesJSON.data(using: .utf8) else { return nil }
+        return try? APIClient.decoder.decode(ServiceList.self, from: data).services
+    }
+
+    static let servicesJSON = """
+    {
+      "services": [
+        {"name":"flaresolverr","state":"running","health":"unhealthy","status":"Up 3 hours (unhealthy)","image":"flaresolverr:latest","project":"flaresolverr","created_at":"2026-10-03T08:00:00+05:30"},
+        {"name":"adguardhome","state":"running","status":"Up 6 hours","image":"adguard/adguardhome:latest","project":"adguard","created_at":"2026-10-03T05:30:00+05:30"},
+        {"name":"authentik-server-1","state":"running","health":"healthy","status":"Up 6 hours (healthy)","image":"authentik:2026.8","project":"authentik","created_at":"2026-10-03T05:30:00+05:30"},
+        {"name":"immich_server","state":"running","health":"healthy","status":"Up 6 hours (healthy)","image":"immich-server:v1.140","project":"immich","created_at":"2026-10-03T05:30:00+05:30"},
+        {"name":"kavita","state":"running","health":"healthy","status":"Up 6 hours (healthy)","image":"kavita:latest","project":"kavita","created_at":"2026-10-03T05:30:00+05:30"},
+        {"name":"ntfy","state":"running","status":"Up 6 hours","image":"binwiederhier/ntfy:latest","project":"ntfy","created_at":"2026-10-03T05:30:00+05:30"},
+        {"name":"uptime-kuma","state":"running","health":"healthy","status":"Up 6 hours (healthy)","image":"uptime-kuma:1","project":"uptimekuma","created_at":"2026-10-03T05:30:00+05:30"},
+        {"name":"webnovel-aggregator","state":"running","status":"Up 2 minutes","image":"webnovel-aggregator:local","project":"webnovel-aggregator","created_at":"2026-10-03T17:35:00+05:30"}
+      ]
+    }
+    """
+
     static let json = """
     {
       "generated_at": "2026-10-03T12:39:57.123+05:30",
