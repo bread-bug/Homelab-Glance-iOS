@@ -14,10 +14,18 @@ targets:
     type: application
     platform: iOS
     deploymentTarget: "26.0"
-    sources: [Sources]
+    sources: [Sources, Shared]
+    dependencies:
+      - target: GlanceShare
     settings:
       base:
         TARGETED_DEVICE_FAMILY: "1,2"
+        PRODUCT_BUNDLE_IDENTIFIER: dev.breadbug.HomelabGlance
+    entitlements:
+      path: Sources/HomelabGlance.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.dev.breadbug.HomelabGlance
     info:
       path: Sources/Info.plist
       properties:
@@ -35,3 +43,31 @@ targets:
           - UIInterfaceOrientationPortraitUpsideDown
           - UIInterfaceOrientationLandscapeLeft
           - UIInterfaceOrientationLandscapeRight
+
+  GlanceShare:
+    type: app-extension
+    platform: iOS
+    deploymentTarget: "26.0"
+    sources: [ShareExtension, Shared]
+    settings:
+      base:
+        TARGETED_DEVICE_FAMILY: "1,2"
+        PRODUCT_BUNDLE_IDENTIFIER: dev.breadbug.HomelabGlance.Share
+    entitlements:
+      path: ShareExtension/GlanceShare.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.dev.breadbug.HomelabGlance
+    info:
+      path: ShareExtension/Info.plist
+      properties:
+        CFBundleDisplayName: Glance
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.share-services
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).ShareViewController
+          NSExtensionAttributes:
+            NSExtensionActivationRule:
+              NSExtensionActivationSupportsWebURLWithMaxCount: 1
+              NSExtensionActivationSupportsText: true

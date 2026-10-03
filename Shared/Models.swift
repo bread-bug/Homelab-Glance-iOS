@@ -121,3 +121,20 @@ struct Job: Decodable, Identifiable {
 enum JobState: String, Decodable {
     case running, succeeded, failed
 }
+
+struct CaptureTarget: Decodable, Identifiable {
+    let id: String
+    let label: String
+    let accepts: String
+}
+
+struct CaptureTargetList: Decodable {
+    let targets: [CaptureTarget]
+}
+
+struct CaptureResult: Decodable {
+    let target: String
+    let ok: Bool
+    let detail: String?
+    let link: String?
+}

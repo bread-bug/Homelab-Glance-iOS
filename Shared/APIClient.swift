@@ -43,6 +43,19 @@ struct APIClient {
         return try await get("/api/v1/jobs/\(encoded)")
     }
 
+    func captureTargets() async throws -> CaptureTargetList {
+        try await get("/api/v1/capture/targets")
+    }
+
+    func capture(to target: String, url: String, text: String) async throws -> CaptureResult {
+        var body: [String: String] = [:]
+        if !url.isEmpty { body["url"] = url }
+        if !text.isEmpty { body["text"] = text }
+        let data = try await send(path: "/api/v1/capture/\(target)", method: "POST",
+                                  body: try JSONEncoder().encode(body))
+        return try Self.decoder.decode(CaptureResult.self, from: data)
+    }
+
     func status() async throws -> Status {
         try await get("/api/v1/status")
     }
@@ -53,7 +66,7 @@ struct APIClient {
     }
 
     @discardableResult
-    private func send(path: String, method: String) async throws -> Data {
+    private func send(path: String, method: String, body: Data? = nil) async throws -> Data {
         guard !baseURL.isEmpty, !apiKey.isEmpty,
               let url = URL(string: baseURL.trimmedTrailingSlash + path) else {
             throw APIError.notConfigured
@@ -63,6 +76,10 @@ struct APIClient {
         request.httpMethod = method
         request.setValue(apiKey, forHTTPHeaderField: "X-API-Key")
         request.timeoutInterval = 30
+        if let body {
+            request.httpBody = body
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        }
 
         let data: Data
         let response: URLResponse
