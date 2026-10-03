@@ -71,7 +71,7 @@ struct ServicesView: View {
         .navigationTitle("Services")
         .searchable(text: $query, prompt: "Filter")
         .refreshable { await store.load() }
-        .task { await store.load() }
+        .autoRefresh(every: .seconds(15)) { await store.load() }
         .alert("Restart failed", isPresented: Binding(
             get: { store.lastError != nil },
             set: { if !$0 { store.lastError = nil } }
